@@ -37,6 +37,10 @@ impl OneDimArrayCstr {
         unsafe { (*self.ptr).size }
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn get(&self, idx: usize) -> Option<Cow<str>> {
         if idx >= self.len() {
             return None;
@@ -45,7 +49,7 @@ impl OneDimArrayCstr {
         let s = if let Some(data) = &self.data {
             unsafe { CStr::from_ptr(data[idx]) }
         } else if idx <= isize::MAX as usize {
-            unsafe { CStr::from_ptr((*self.ptr).data.offset(idx as isize).read()) }
+            unsafe { CStr::from_ptr((*self.ptr).data.add(idx).read()) }
         } else {
             return None;
         };
