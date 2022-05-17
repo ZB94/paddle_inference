@@ -3,7 +3,7 @@ use crate::ctypes::{PD_OneDimArraySize, PD_TwoDimArraySize, PD_TwoDimArraySizeDe
 use std::ops::Deref;
 
 pub struct TwoDimArraySize {
-    ptr: *mut PD_TwoDimArraySize,
+    pub(crate) ptr: *mut PD_TwoDimArraySize,
     data: Option<(Vec<OneDimArraySize>, Vec<*mut PD_OneDimArraySize>)>,
 }
 
