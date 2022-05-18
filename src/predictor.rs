@@ -40,7 +40,7 @@ impl Predictor {
     ///
     /// **注意:** 如果输入名称中包含字符`\0`，则只会将`\0`之前的字符作为输入
     pub fn input(&self, name: &str) -> Tensor {
-        let (_, name) = to_c_str(name);
+        let (_n, name) = to_c_str(name);
         let ptr = unsafe { PD_PredictorGetInputHandle(self.ptr, name) };
         Tensor::from_ptr(ptr)
     }
@@ -60,7 +60,7 @@ impl Predictor {
     ///
     /// **注意:** 如果输入名称中包含字符`\0`，则只会将`\0`之前的字符作为输入
     pub fn output(&self, name: &str) -> Tensor {
-        let (_, name) = to_c_str(name);
+        let (_n, name) = to_c_str(name);
         let ptr = unsafe { PD_PredictorGetOutputHandle(self.ptr, name) };
         Tensor::from_ptr(ptr)
     }

@@ -2,6 +2,8 @@
 name = "paddle_inference"
 version = "0.1.0"
 edition = "2021"
+authors = ["ZB_陈 <949536395@qq.com>"]
+keywords = ["ml", "dl", "paddle", "ffi"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

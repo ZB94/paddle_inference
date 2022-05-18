@@ -42,7 +42,7 @@ impl SetConfig for Model {
     fn set_to(self, config: *mut PD_Config) {
         match self {
             Model::Dir(dir) => {
-                let (_, ptr) = to_c_str(&dir);
+                let (_p, ptr) = to_c_str(&dir);
                 unsafe {
                     PD_ConfigSetModelDir(config, ptr);
                 }

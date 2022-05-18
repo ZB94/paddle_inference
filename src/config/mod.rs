@@ -163,7 +163,7 @@ impl Config {
         unsafe { PD_ConfigEnableMemoryOptim(config, memory_optimization) };
 
         if let Some(s) = optimization_cache_dir {
-            let (_, cs) = to_c_str(&s);
+            let (_s, cs) = to_c_str(&s);
             unsafe { PD_ConfigSetOptimCacheDir(config, cs) };
         }
 
