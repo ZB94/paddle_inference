@@ -1,3 +1,5 @@
+//! 通用数据类型
+
 pub use crate::ctypes::{DataType, PlaceType, PrecisionType};
 mod array_1d_cstr;
 mod array_1d_i32;

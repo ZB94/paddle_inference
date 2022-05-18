@@ -1,4 +1,9 @@
 pub mod common;
+pub mod config;
 pub mod ctypes;
-pub mod predictor;
-pub mod tensor;
+mod predictor;
+mod tensor;
+pub mod utils;
+
+pub use predictor::Predictor;
+pub use tensor::Tensor;

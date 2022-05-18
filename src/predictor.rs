@@ -1,19 +1,25 @@
 use crate::common::OneDimArrayCstr;
+use crate::config::model::Model;
+use crate::config::Config;
 use crate::ctypes::{
     PD_Predictor, PD_PredictorClone, PD_PredictorDestroy, PD_PredictorGetInputHandle,
     PD_PredictorGetInputNames, PD_PredictorGetInputNum, PD_PredictorGetOutputHandle,
     PD_PredictorGetOutputNames, PD_PredictorGetOutputNum, PD_PredictorRun,
 };
 use crate::tensor::Tensor;
-use std::ffi::CString;
+use crate::utils::to_c_str;
 
+/// Paddle Inference 的预测器
 pub struct Predictor {
     ptr: *mut PD_Predictor,
 }
 
-/// Paddle Inference 的预测器
 impl Predictor {
-    pub fn from_ptr(ptr: *mut PD_Predictor) -> Self {
+    pub fn builder(model: Model) -> Config {
+        Config::new(model)
+    }
+
+    pub(crate) fn from_ptr(ptr: *mut PD_Predictor) -> Self {
         Self { ptr }
     }
 }
@@ -34,7 +40,7 @@ impl Predictor {
     ///
     /// **注意:** 如果输入名称中包含字符`\0`，则只会将`\0`之前的字符作为输入
     pub fn input(&self, name: &str) -> Tensor {
-        let (_, name) = Self::to_c_str(name);
+        let (_, name) = to_c_str(name);
         let ptr = unsafe { PD_PredictorGetInputHandle(self.ptr, name) };
         Tensor::from_ptr(ptr)
     }
@@ -54,26 +60,9 @@ impl Predictor {
     ///
     /// **注意:** 如果输入名称中包含字符`\0`，则只会将`\0`之前的字符作为输入
     pub fn output(&self, name: &str) -> Tensor {
-        let (_, name) = Self::to_c_str(name);
+        let (_, name) = to_c_str(name);
         let ptr = unsafe { PD_PredictorGetOutputHandle(self.ptr, name) };
         Tensor::from_ptr(ptr)
-    }
-
-    fn to_c_str(s: &str) -> (Option<CString>, *const i8) {
-        CString::new(s)
-            .map(|s| {
-                let ptr = s.as_ptr();
-                (Some(s), ptr)
-            })
-            .unwrap_or_else(|_| {
-                let s = s.as_bytes();
-                let idx = s
-                    .iter()
-                    .enumerate()
-                    .find_map(|(idx, v)| if v == &0 { Some(idx) } else { None })
-                    .unwrap();
-                (None, s[..idx].as_ptr() as *const _)
-            })
     }
 }
 

@@ -1,3 +1,7 @@
+//! paddle inference C 接口
+
+#![allow(rustdoc::bare_urls)]
+#![allow(rustdoc::broken_intra_doc_links)]
 #![allow(non_camel_case_types)]
 
 #[link(name = "paddle_inference_c")]
