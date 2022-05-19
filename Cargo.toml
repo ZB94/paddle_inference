@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 authors = ["ZB_陈 <949536395@qq.com>"]
 keywords = ["ml", "dl", "paddle", "ffi"]
+repository = "https://github.com/ZB94/paddle_inference"
+license = "Apache-2.0"
+description = "paddle_inference_c的Rust封装"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

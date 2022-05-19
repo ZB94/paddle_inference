@@ -1,6 +1,12 @@
-# [Paddle Inference](https://paddleinference.paddlepaddle.org.cn/product_introduction/summary.html)
+# Paddle Inference
 
-本库是对百度飞浆推理库C接口的封装，使用前请先查看[文档](https://paddleinference.paddlepaddle.org.cn/quick_start/c_demo.html)做好配置
+本库是对百度飞浆推理库C接口的封装，详细说明请参考[官方文档](https://paddleinference.paddlepaddle.org.cn/api_reference/c_api_index.html)
+
+## 使用说明
+
+1. 编译前请先[下载或编译预测库](https://paddleinference.paddlepaddle.org.cn/user_guides/source_compile.html)
+2. 编译时请确保`paddle_inference_c`库（Windows下为`paddle_inference_c.lib`, Linux下为`libpaddle_inference_c.a`）处于能被链接器搜索的位置
+（Windows MSVC下设置环境变量`LIB`/Linux下设置环境变量`LD_LIBRARY_PATH`并指向库所在**目录**）
 
 ## 使用示例
 ```rust
