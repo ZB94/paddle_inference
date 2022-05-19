@@ -35,25 +35,19 @@ pub struct Gpu {
 
 #[derive(Debug)]
 pub struct Xpu {
-    /// l3 cache 分配的显存大小。单位为 mb
-    pub l3_workspace_size_mb: i32,
-    /// 是否独占申请的 l3 cache。如果为false，分配的多个 l3 cache 可以被多个模型共享
-    ///
-    /// Whether the allocated L3 cache can be locked. If false, it means that the L3 cache is
-    /// not locked, and the allocated L3 cache can be shared by multiple models, and multiple
-    /// models sharing the L3 cache will be executed sequentially on the card.
+    /// l3 cache 分配的显存大小，最大为16M
+    pub l3_workspace_size: i32,
+    /// 分配的L3 cache是否可以锁定。如果为false，表示不锁定L3 cache，则分配的L3 cache可以多个模型共享，多个共享L3
+    /// cache的模型在卡上将顺序执行
     pub locked: bool,
-    /// Whether to autotune the conv operator in the model. If true, when the conv operator of
-    /// a certain dimension is executed for the first time, it will automatically search for a
-    /// better algorithm to improve the performance of subsequent conv operators of the same
-    /// dimension.
+    /// 是否对模型中的conv算子进行autotune。如果为true，则在第一次执行到某个维度的conv算子时，将自动搜索更优的算法，
+    /// 用以提升后续相同维度的conv算子的性能
     pub autorune: bool,
-    /// Specify the path of the autotune file. If autotune_file is specified, the algorithm
-    /// specified in the file will be used and autotune will not be performed again.
+    /// 指定autotune文件路径。如果指定autotune_file，则使用文件中指定的算法，不再重新进行autotune
     pub autotune_file: Option<String>,
-    /// Calculation accuracy of multi_encoder
+    /// multi_encoder的计算精度
     pub precision: String,
-    /// Is the input of multi_encoder variable length
+    /// multi_encoder的输入是否可变长
     pub adaptive_seqlen: bool,
 }
 
@@ -267,7 +261,7 @@ impl SetConfig for Gpu {
 impl SetConfig for Xpu {
     fn set_to(self, config: *mut PD_Config) {
         let Xpu {
-            l3_workspace_size_mb,
+            l3_workspace_size,
             locked,
             autorune,
             autotune_file,
@@ -283,7 +277,7 @@ impl SetConfig for Xpu {
         call! {
             PD_ConfigEnableXpu(
                 config,
-                l3_workspace_size_mb,
+                l3_workspace_size,
                 locked,
                 autorune,
                 af,

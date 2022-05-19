@@ -1,6 +1,6 @@
 [package]
 name = "paddle_inference"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["ZB_陈 <949536395@qq.com>"]
 keywords = ["ml", "dl", "paddle", "ffi"]
