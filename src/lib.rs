@@ -16,7 +16,7 @@ static LIBRARY: Lazy<Library> = Lazy::new(|| unsafe {
     Library::new(library_filename("paddle_inference_c")).expect("can't not load paddle_inference_c")
 });
 
-/// 用于快速调用实现了[`paddle_inference::ctypes::Function`]的对象
+/// 用于快速调用实现了[`ctypes::Function`]的对象
 ///
 /// **使用方法：**
 ///
