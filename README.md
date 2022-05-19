@@ -5,11 +5,12 @@
 ## 使用说明
 
 1. 编译前请先[下载或编译预测库](https://paddleinference.paddlepaddle.org.cn/user_guides/source_compile.html)
-2. 编译时请确保`paddle_inference_c`库（Windows下为`paddle_inference_c.lib`, Linux下为`libpaddle_inference_c.a`）处于能被链接器搜索的位置
-（Windows MSVC下设置环境变量`LIB`/Linux下设置环境变量`LD_LIBRARY_PATH`并指向库所在**目录**）
+2. 使用时请确保`paddle_inference_c`的动态库及其第三方依赖库能被正常搜索到。如：
+    - Windows 下动态库及第三方依赖库目录应在环境变量`PATH`中
+    - Linux 下动态库及第三方依赖库目录应在环境变量`LD_LIBRARY_PATH`中
 
 ## 使用示例
-```rust
+```no_run
 use paddle_inference::config::model::Model;
 use paddle_inference::config::setting::Cpu;
 use paddle_inference::Predictor;

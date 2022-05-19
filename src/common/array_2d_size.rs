@@ -1,3 +1,4 @@
+use crate::call;
 use crate::common::OneDimArraySize;
 use crate::ctypes::{PD_OneDimArraySize, PD_TwoDimArraySize, PD_TwoDimArraySizeDestroy};
 use std::ops::Deref;
@@ -34,7 +35,7 @@ impl Drop for TwoDimArraySize {
         if self.data.is_some() {
             unsafe { Box::from_raw(self.ptr) };
         } else {
-            unsafe { PD_TwoDimArraySizeDestroy(self.ptr) }
+            call! { PD_TwoDimArraySizeDestroy(self.ptr) }
         }
     }
 }

@@ -1,3 +1,4 @@
+use crate::call;
 use crate::config::SetConfig;
 use crate::ctypes::{PD_Config, PD_ConfigSetModel, PD_ConfigSetModelBuffer, PD_ConfigSetModelDir};
 use crate::utils::to_c_str;
@@ -43,9 +44,7 @@ impl SetConfig for Model {
         match self {
             Model::Dir(dir) => {
                 let (_p, ptr) = to_c_str(&dir);
-                unsafe {
-                    PD_ConfigSetModelDir(config, ptr);
-                }
+                call! { PD_ConfigSetModelDir(config, ptr) };
             }
             Model::Path {
                 model_file_path,
@@ -53,19 +52,19 @@ impl SetConfig for Model {
             } => {
                 let (_m, model_path) = to_c_str(&model_file_path);
                 let (_p, params_path) = to_c_str(&params_file_path);
-                unsafe {
-                    PD_ConfigSetModel(config, model_path, params_path);
-                }
+                call! { PD_ConfigSetModel(config, model_path, params_path) };
             }
-            Model::Memory { model, params } => unsafe {
-                PD_ConfigSetModelBuffer(
-                    config,
-                    model.as_ptr() as *const _,
-                    model.len(),
-                    params.as_ptr() as *const _,
-                    params.len(),
-                );
-            },
+            Model::Memory { model, params } => {
+                call! {
+                    PD_ConfigSetModelBuffer(
+                        config,
+                        model.as_ptr() as *const _,
+                        model.len(),
+                        params.as_ptr() as *const _,
+                        params.len()
+                    )
+                };
+            }
         }
     }
 }

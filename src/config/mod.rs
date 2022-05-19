@@ -4,6 +4,7 @@ pub mod lite_engine;
 pub mod model;
 pub mod setting;
 
+use crate::call;
 use crate::config::lite_engine::LiteEngine;
 use crate::config::setting::{Cpu, Gpu, ONNXRuntime, Xpu};
 use crate::ctypes::{
@@ -138,7 +139,7 @@ impl Config {
             disable_log,
         } = self;
 
-        let config = unsafe { PD_ConfigCreate() };
+        let config = call! { PD_ConfigCreate() };
 
         model.set_to(config);
 
@@ -153,33 +154,33 @@ impl Config {
             o.set_to(config)
         }
 
-        unsafe { PD_ConfigSwitchIrDebug(config, ir_optimization) };
-        unsafe { PD_ConfigSwitchIrDebug(config, ir_debug) };
+        call! { PD_ConfigSwitchIrDebug(config, ir_optimization) };
+        call! { PD_ConfigSwitchIrDebug(config, ir_debug) };
 
         if let Some(l) = lite {
             l.set_to(config)
         }
 
-        unsafe { PD_ConfigEnableMemoryOptim(config, memory_optimization) };
+        call! { PD_ConfigEnableMemoryOptim(config, memory_optimization) };
 
         if let Some(s) = optimization_cache_dir {
             let (_s, cs) = to_c_str(&s);
-            unsafe { PD_ConfigSetOptimCacheDir(config, cs) };
+            call! { PD_ConfigSetOptimCacheDir(config, cs) };
         }
 
         if disable_fc_padding {
-            unsafe { PD_ConfigDisableFCPadding(config) };
+            call! { PD_ConfigDisableFCPadding(config) };
         }
 
         if profile {
-            unsafe { PD_ConfigProfileEnabled(config) };
+            call! { PD_ConfigProfileEnabled(config) };
         }
 
         if disable_log {
-            unsafe { PD_ConfigDisableGlogInfo(config) };
+            call! { PD_ConfigDisableGlogInfo(config) };
         }
 
-        let ptr = unsafe { PD_PredictorCreate(config) };
+        let ptr = call! { PD_PredictorCreate(config) };
         Predictor::from_ptr(ptr)
     }
 }

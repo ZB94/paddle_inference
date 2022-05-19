@@ -1,3 +1,4 @@
+use crate::call;
 use crate::common::{DataType, OneDimArrayInt32, PlaceType, TwoDimArraySize};
 use crate::ctypes::{
     PD_Tensor, PD_TensorCopyFromCpuFloat, PD_TensorCopyFromCpuInt32, PD_TensorCopyFromCpuInt64,
@@ -27,56 +28,56 @@ impl Tensor {
 impl Tensor {
     /// 设置维度信息
     pub fn reshape(&self, shape: &[i32]) {
-        unsafe {
-            PD_TensorReshape(self.ptr, shape.len(), shape.as_ptr() as *mut _);
-        }
+        call! {
+            PD_TensorReshape(self.ptr, shape.len(), shape.as_ptr() as *mut _)
+        };
     }
 
     /// 获取维度信息
     pub fn shape(&self) -> Vec<i32> {
-        let ptr = unsafe { PD_TensorGetShape(self.ptr) };
+        let ptr = call! { PD_TensorGetShape(self.ptr) };
         OneDimArrayInt32::from_ptr(ptr).to_vec()
     }
 
     pub fn data_type(&self) -> DataType {
-        unsafe { PD_TensorGetDataType(self.ptr) }
+        call! { PD_TensorGetDataType(self.ptr) }
     }
 
     pub fn name(&self) -> Cow<str> {
-        let ptr = unsafe { PD_TensorGetName(self.ptr) };
+        let ptr = call! { PD_TensorGetName(self.ptr) };
         unsafe { CStr::from_ptr(ptr).to_string_lossy() }
     }
 }
 
 impl Tensor {
     pub fn copy_from_f32(&self, data: &[f32]) {
-        unsafe {
-            PD_TensorCopyFromCpuFloat(self.ptr, data.as_ptr());
-        }
+        call! {
+            PD_TensorCopyFromCpuFloat(self.ptr, data.as_ptr())
+        };
     }
 
     pub fn copy_from_i64(&self, data: &[i64]) {
-        unsafe {
-            PD_TensorCopyFromCpuInt64(self.ptr, data.as_ptr());
-        }
+        call! {
+            PD_TensorCopyFromCpuInt64(self.ptr, data.as_ptr())
+        };
     }
 
     pub fn copy_from_i32(&self, data: &[i32]) {
-        unsafe {
-            PD_TensorCopyFromCpuInt32(self.ptr, data.as_ptr());
-        }
+        call! {
+            PD_TensorCopyFromCpuInt32(self.ptr, data.as_ptr())
+        };
     }
 
     pub fn copy_from_u8(&self, data: &[u8]) {
-        unsafe {
-            PD_TensorCopyFromCpuUint8(self.ptr, data.as_ptr());
-        }
+        call! {
+            PD_TensorCopyFromCpuUint8(self.ptr, data.as_ptr())
+        };
     }
 
     pub fn copy_from_i8(&self, data: &[i8]) {
-        unsafe {
-            PD_TensorCopyFromCpuInt8(self.ptr, data.as_ptr());
-        }
+        call! {
+            PD_TensorCopyFromCpuInt8(self.ptr, data.as_ptr())
+        };
     }
 }
 
@@ -104,9 +105,7 @@ impl Tensor {
     /// - 输入数据大小小于[`Self::shape`]结果之积
     pub fn copy_to_f32(&self, data: &mut [f32]) -> bool {
         if self.check(data.len(), DataType::Float32) {
-            unsafe {
-                PD_TensorCopyToCpuFloat(self.ptr, data.as_mut_ptr());
-            }
+            call! { PD_TensorCopyToCpuFloat(self.ptr, data.as_mut_ptr()) };
             true
         } else {
             false
@@ -120,9 +119,7 @@ impl Tensor {
     /// - 输入数据大小小于[`Self::shape`]结果之积
     pub fn copy_to_i64(&self, data: &mut [i64]) -> bool {
         if self.check(data.len(), DataType::Int64) {
-            unsafe {
-                PD_TensorCopyToCpuInt64(self.ptr, data.as_mut_ptr());
-            }
+            call! { PD_TensorCopyToCpuInt64(self.ptr, data.as_mut_ptr()) };
             true
         } else {
             false
@@ -136,9 +133,7 @@ impl Tensor {
     /// - 输入数据大小小于[`Self::shape`]结果之积
     pub fn copy_to_i32(&self, data: &mut [i32]) -> bool {
         if self.check(data.len(), DataType::Int32) {
-            unsafe {
-                PD_TensorCopyToCpuInt32(self.ptr, data.as_mut_ptr());
-            }
+            call! { PD_TensorCopyToCpuInt32(self.ptr, data.as_mut_ptr()) };
             true
         } else {
             false
@@ -152,9 +147,7 @@ impl Tensor {
     /// - 输入数据大小小于[`Self::shape`]结果之积
     pub fn copy_to_u8(&self, data: &mut [u8]) -> bool {
         if self.check(data.len(), DataType::Uint8) {
-            unsafe {
-                PD_TensorCopyToCpuUint8(self.ptr, data.as_mut_ptr());
-            }
+            call! { PD_TensorCopyToCpuUint8(self.ptr, data.as_mut_ptr()) };
             true
         } else {
             false
@@ -168,9 +161,7 @@ impl Tensor {
     /// - 输入数据大小小于[`Self::shape`]结果之积
     pub fn copy_to_i8(&self, data: &mut [i8]) -> bool {
         if self.check(data.len(), DataType::Uint8) {
-            unsafe {
-                PD_TensorCopyToCpuInt8(self.ptr, data.as_mut_ptr());
-            }
+            call! { PD_TensorCopyToCpuInt8(self.ptr, data.as_mut_ptr()) };
             true
         } else {
             false
@@ -186,7 +177,7 @@ impl Tensor {
     /// 如果底层数据类型([`DataType`])不对应则返回`None`
     pub fn as_mut_slice_f32(&self, place_type: PlaceType) -> Option<&mut [f32]> {
         self.check_data_type(DataType::Float32).then(|| {
-            let ptr = unsafe { PD_TensorMutableDataFloat(self.ptr, place_type) };
+            let ptr = call! { PD_TensorMutableDataFloat(self.ptr, place_type) };
             unsafe { std::slice::from_raw_parts_mut(ptr, self.size()) }
         })
     }
@@ -198,7 +189,7 @@ impl Tensor {
     /// 如果底层数据类型([`DataType`])不对应则返回`None`
     pub fn as_mut_slice_i64(&self, place_type: PlaceType) -> Option<&mut [i64]> {
         self.check_data_type(DataType::Int64).then(|| {
-            let ptr = unsafe { PD_TensorMutableDataInt64(self.ptr, place_type) };
+            let ptr = call! { PD_TensorMutableDataInt64(self.ptr, place_type) };
             unsafe { std::slice::from_raw_parts_mut(ptr, self.size()) }
         })
     }
@@ -210,7 +201,7 @@ impl Tensor {
     /// 如果底层数据类型([`DataType`])不对应则返回`None`
     pub fn as_mut_slice_i32(&self, place_type: PlaceType) -> Option<&mut [i32]> {
         self.check_data_type(DataType::Int32).then(|| {
-            let ptr = unsafe { PD_TensorMutableDataInt32(self.ptr, place_type) };
+            let ptr = call! { PD_TensorMutableDataInt32(self.ptr, place_type) };
             unsafe { std::slice::from_raw_parts_mut(ptr, self.size()) }
         })
     }
@@ -222,7 +213,7 @@ impl Tensor {
     /// 如果底层数据类型([`DataType`])不对应则返回`None`
     pub fn as_mut_slice_u8(&self, place_type: PlaceType) -> Option<&mut [u8]> {
         self.check_data_type(DataType::Uint8).then(|| {
-            let ptr = unsafe { PD_TensorMutableDataUint8(self.ptr, place_type) };
+            let ptr = call! { PD_TensorMutableDataUint8(self.ptr, place_type) };
             unsafe { std::slice::from_raw_parts_mut(ptr, self.size()) }
         })
     }
@@ -234,7 +225,7 @@ impl Tensor {
     /// 如果底层数据类型([`DataType`])不对应则返回`None`
     pub fn as_mut_slice_i8(&self, place_type: PlaceType) -> Option<&mut [i8]> {
         self.check_data_type(DataType::Uint8).then(|| {
-            let ptr = unsafe { PD_TensorMutableDataInt8(self.ptr, place_type) };
+            let ptr = call! { PD_TensorMutableDataInt8(self.ptr, place_type) };
             unsafe { std::slice::from_raw_parts_mut(ptr, self.size()) }
         })
     }
@@ -248,7 +239,7 @@ impl Tensor {
         self.check_data_type(DataType::Float32).then(|| {
             let mut place_type = PlaceType::Unknown;
             let mut size = 0;
-            let ptr = unsafe { PD_TensorDataFloat(self.ptr, &mut place_type, &mut size) };
+            let ptr = call! { PD_TensorDataFloat(self.ptr, &mut place_type, &mut size) };
             let s = unsafe { std::slice::from_raw_parts(ptr, size as usize) };
             (place_type, s)
         })
@@ -261,7 +252,7 @@ impl Tensor {
         self.check_data_type(DataType::Int64).then(|| {
             let mut place_type = PlaceType::Unknown;
             let mut size = 0;
-            let ptr = unsafe { PD_TensorDataInt64(self.ptr, &mut place_type, &mut size) };
+            let ptr = call! { PD_TensorDataInt64(self.ptr, &mut place_type, &mut size) };
             let s = unsafe { std::slice::from_raw_parts(ptr, size as usize) };
             (place_type, s)
         })
@@ -274,7 +265,7 @@ impl Tensor {
         self.check_data_type(DataType::Int32).then(|| {
             let mut place_type = PlaceType::Unknown;
             let mut size = 0;
-            let ptr = unsafe { PD_TensorDataInt32(self.ptr, &mut place_type, &mut size) };
+            let ptr = call! { PD_TensorDataInt32(self.ptr, &mut place_type, &mut size) };
             let s = unsafe { std::slice::from_raw_parts(ptr, size as usize) };
             (place_type, s)
         })
@@ -287,7 +278,7 @@ impl Tensor {
         self.check_data_type(DataType::Uint8).then(|| {
             let mut place_type = PlaceType::Unknown;
             let mut size = 0;
-            let ptr = unsafe { PD_TensorDataUint8(self.ptr, &mut place_type, &mut size) };
+            let ptr = call! { PD_TensorDataUint8(self.ptr, &mut place_type, &mut size) };
             let s = unsafe { std::slice::from_raw_parts(ptr, size as usize) };
             (place_type, s)
         })
@@ -300,7 +291,7 @@ impl Tensor {
         self.check_data_type(DataType::Uint8).then(|| {
             let mut place_type = PlaceType::Unknown;
             let mut size = 0;
-            let ptr = unsafe { PD_TensorDataInt8(self.ptr, &mut place_type, &mut size) };
+            let ptr = call! { PD_TensorDataInt8(self.ptr, &mut place_type, &mut size) };
             let s = unsafe { std::slice::from_raw_parts(ptr, size as usize) };
             (place_type, s)
         })
@@ -309,21 +300,17 @@ impl Tensor {
 
 impl Tensor {
     pub fn set_lod(&self, lod: TwoDimArraySize) {
-        unsafe {
-            PD_TensorSetLod(self.ptr, lod.ptr);
-        }
+        call! { PD_TensorSetLod(self.ptr, lod.ptr) };
     }
 
     pub fn lod(&self) -> TwoDimArraySize {
-        let ptr = unsafe { PD_TensorGetLod(self.ptr) };
+        let ptr = call!(PD_TensorGetLod(self.ptr));
         TwoDimArraySize::from_ptr(ptr)
     }
 }
 
 impl Drop for Tensor {
     fn drop(&mut self) {
-        unsafe {
-            PD_TensorDestroy(self.ptr);
-        }
+        call!(PD_TensorDestroy(self.ptr));
     }
 }

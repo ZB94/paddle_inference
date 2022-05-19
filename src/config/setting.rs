@@ -1,3 +1,4 @@
+use crate::call;
 use crate::common::PrecisionType;
 use crate::config::SetConfig;
 use crate::ctypes::{
@@ -141,7 +142,7 @@ impl SetConfig for Cpu {
         let Cpu { threads, mkldnn } = self;
         if let Some(t) = threads {
             if t > 0 {
-                unsafe { PD_ConfigSetCpuMathLibraryNumThreads(config, t) };
+                call! { PD_ConfigSetCpuMathLibraryNumThreads(config, t) };
             }
         }
         if let Some(Mkldnn {
@@ -152,23 +153,19 @@ impl SetConfig for Cpu {
         {
             if let Some(cache) = cache_size {
                 if cache > 0 {
-                    unsafe { PD_ConfigSetMkldnnCacheCapacity(config, cache) };
+                    call! { PD_ConfigSetMkldnnCacheCapacity(config, cache) };
                 }
             }
             if let Some(op) = op {
                 let (_l, mut r): (Vec<_>, Vec<_>) = op.iter().map(|s| to_c_str(s)).unzip();
                 let size = r.len();
-                unsafe {
-                    PD_ConfigSetMkldnnOp(config, size, r.as_mut_ptr());
-                }
+                call! { PD_ConfigSetMkldnnOp(config, size, r.as_mut_ptr()) };
             }
             if let Some(op) = op_f16 {
-                unsafe { PD_ConfigEnableMkldnnBfloat16(config) };
+                call! { PD_ConfigEnableMkldnnBfloat16(config) };
                 let (_l, mut r): (Vec<_>, Vec<_>) = op.iter().map(|s| to_c_str(s)).unzip();
                 let size = r.len();
-                unsafe {
-                    PD_ConfigSetBfloat16Op(config, size, r.as_mut_ptr());
-                }
+                call! { PD_ConfigSetBfloat16Op(config, size, r.as_mut_ptr()) };
             }
         }
     }
@@ -184,14 +181,12 @@ impl SetConfig for Gpu {
             enable_tensor_rt,
         } = self;
 
-        unsafe {
-            PD_ConfigEnableUseGpu(config, memory_pool_init_size_mb, device_id);
-        }
+        call! { PD_ConfigEnableUseGpu(config, memory_pool_init_size_mb, device_id) };
         if enable_multi_stream {
-            unsafe { PD_ConfigEnableGpuMultiStream(config) };
+            call! { PD_ConfigEnableGpuMultiStream(config) };
         }
         if enable_cudnn {
-            unsafe { PD_ConfigEnableCudnn(config) };
+            call! { PD_ConfigEnableCudnn(config) };
         }
         if let Some(TensorRT {
             workspace_size,
@@ -206,7 +201,7 @@ impl SetConfig for Gpu {
             dla_core,
         }) = enable_tensor_rt
         {
-            unsafe {
+            call! {
                 PD_ConfigEnableTensorRtEngine(
                     config,
                     workspace_size,
@@ -214,9 +209,9 @@ impl SetConfig for Gpu {
                     min_subgraph_size,
                     precision_type,
                     use_static,
-                    use_calib_mode,
-                );
-            }
+                    use_calib_mode
+                )
+            };
 
             if !dynamic_shape_info.is_empty() {
                 let tensor_num = dynamic_shape_info.len();
@@ -244,7 +239,7 @@ impl SetConfig for Gpu {
                     optim_shapes.push(optim_shape.as_ptr() as *mut i32);
                 }
 
-                unsafe {
+                call! {
                     PD_ConfigSetTrtDynamicShapeInfo(
                         config,
                         tensor_num,
@@ -253,17 +248,17 @@ impl SetConfig for Gpu {
                         min_shapes.as_mut_ptr(),
                         max_shapes.as_mut_ptr(),
                         optim_shapes.as_mut_ptr(),
-                        disable_plugin_fp16,
-                    );
-                }
+                        disable_plugin_fp16
+                    )
+                };
             }
 
             if enable_oss {
-                unsafe { PD_ConfigEnableTensorRtOSS(config) };
+                call! { PD_ConfigEnableTensorRtOSS(config) };
             }
 
             if let Some(dla_core) = dla_core {
-                unsafe { PD_ConfigEnableTensorRtDla(config, dla_core) };
+                call! { PD_ConfigEnableTensorRtDla(config, dla_core) };
             }
         }
     }
@@ -285,7 +280,7 @@ impl SetConfig for Xpu {
             .unwrap_or_else(|| (None, null()));
         let (_p, p) = to_c_str(&precision);
 
-        unsafe {
+        call! {
             PD_ConfigEnableXpu(
                 config,
                 l3_workspace_size_mb,
@@ -293,17 +288,17 @@ impl SetConfig for Xpu {
                 autorune,
                 af,
                 p,
-                adaptive_seqlen,
-            );
-        }
+                adaptive_seqlen
+            )
+        };
     }
 }
 
 impl SetConfig for ONNXRuntime {
     fn set_to(self, config: *mut PD_Config) {
-        unsafe { PD_ConfigEnableONNXRuntime(config) };
+        call! { PD_ConfigEnableONNXRuntime(config) };
         if self.enable_optimization {
-            unsafe { PD_ConfigEnableORTOptimization(config) };
+            call! { PD_ConfigEnableORTOptimization(config) };
         }
     }
 }

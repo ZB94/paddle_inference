@@ -1,3 +1,4 @@
+use crate::call;
 use crate::common::PrecisionType;
 use crate::config::SetConfig;
 use crate::ctypes::{PD_Config, PD_ConfigEnableLiteEngine};
@@ -36,7 +37,7 @@ impl SetConfig for LiteEngine {
             .unzip::<_, _, Vec<_>, Vec<_>>();
         let ops_filter_num = ops_filter_ptr.len();
 
-        unsafe {
+        call! {
             PD_ConfigEnableLiteEngine(
                 config,
                 precision,
@@ -44,8 +45,8 @@ impl SetConfig for LiteEngine {
                 passes_filter_num,
                 passes_filter_ptr.as_mut_ptr(),
                 ops_filter_num,
-                ops_filter_ptr.as_mut_ptr(),
-            );
-        }
+                ops_filter_ptr.as_mut_ptr()
+            )
+        };
     }
 }

@@ -1,3 +1,4 @@
+use crate::call;
 use crate::ctypes::{PD_OneDimArrayInt32, PD_OneDimArrayInt32Destroy};
 use std::ops::{Deref, DerefMut};
 
@@ -35,7 +36,7 @@ impl Drop for OneDimArrayInt32 {
         if self.data.is_some() {
             unsafe { Box::from_raw(self.ptr) };
         } else {
-            unsafe { PD_OneDimArrayInt32Destroy(self.ptr) }
+            call! { PD_OneDimArrayInt32Destroy(self.ptr) }
         }
     }
 }
