@@ -1,4 +1,7 @@
 #![doc = include_str!("../README.md")]
+#[cfg(feature = "serde")]
+#[cfg_attr(feature = "serde", macro_use)]
+extern crate serde;
 
 pub mod common;
 pub mod config;
@@ -35,8 +38,7 @@ static LIBRARY: Lazy<Library> = Lazy::new(|| unsafe {
 macro_rules! call {
     ($name: ident ( $( $args: expr ),* )) => {
         unsafe {
-            use crate::ctypes::Function;
-            <$name>::get()( $($args),* )
+            <$name as $crate::ctypes::Function>::get()( $($args),* )
         }
     };
 }

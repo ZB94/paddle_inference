@@ -11,6 +11,7 @@ use libloading::Symbol;
 pub type PD_Bool = bool;
 
 /// Tensor 的数据精度, 默认值为[`DataType::Float32`]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum DataType {
@@ -28,6 +29,7 @@ impl Default for DataType {
 }
 
 /// 模型的运行精度, 默认值为[`PrecisionType::Float32`]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum PrecisionType {
@@ -43,6 +45,7 @@ impl Default for PrecisionType {
 }
 
 /// 目标设备硬件类型，用户可以根据应用场景选择硬件平台类型
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum PlaceType {
@@ -265,7 +268,7 @@ pub trait Function {
         unsafe {
             crate::LIBRARY
                 .get(Self::NAME.as_bytes())
-                .expect(&format!("can't get symbol {}", Self::NAME))
+                .unwrap_or_else(|_| panic!("can't get symbol {}", Self::NAME))
         }
     }
 }

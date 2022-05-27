@@ -11,7 +11,8 @@ use crate::ctypes::{
 use crate::utils::to_c_str;
 use std::ptr::null;
 
-#[derive(Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Default, Clone)]
 pub struct Cpu {
     /// 设置 CPU Blas 库计算线程数
     pub threads: Option<i32>,
@@ -19,7 +20,8 @@ pub struct Cpu {
     pub mkldnn: Option<Mkldnn>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone)]
 pub struct Gpu {
     /// 初始化分配的gpu显存，以MB为单位
     pub memory_pool_init_size_mb: u64,
@@ -33,7 +35,8 @@ pub struct Gpu {
     pub enable_tensor_rt: Option<TensorRT>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone)]
 pub struct Xpu {
     /// l3 cache 分配的显存大小，最大为16M
     pub l3_workspace_size: i32,
@@ -51,13 +54,15 @@ pub struct Xpu {
     pub adaptive_seqlen: bool,
 }
 
-#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Copy, Clone)]
 pub struct ONNXRuntime {
     /// 启用 ONNXRuntime 预测时开启优化
     pub enable_optimization: bool,
 }
 
-#[derive(Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Default, Clone)]
 pub struct Mkldnn {
     /// 设置 MKLDNN 针对不同输入 shape 的 cache 容量大小
     pub cache_size: Option<i32>,
@@ -76,7 +81,8 @@ pub struct Mkldnn {
 /// 3. 启用 TensorRT OSS 可以支持更多 plugin，详细参考 [TensorRT OSS](https://news.developer.nvidia.com/nvidia-open-sources-parsers-and-plugins-in-tensorrt/)
 ///
 /// 更多 TensorRT 详细信息，请参考[使用Paddle-TensorRT库预测](https://paddleinference.paddlepaddle.org.cn/optimize/paddle_trt.html)。
-#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone)]
 pub struct TensorRT {
     /// 指定 TensorRT 使用的工作空间大小
     pub workspace_size: i32,
@@ -107,7 +113,8 @@ pub struct TensorRT {
 /// TensorRT 的动态 Shape 信息
 ///
 /// **注意：** DynamicShapeInfo 中所有shape的大小必须相同
-#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone)]
 pub struct DynamicShapeInfo {
     /// Tensor 名称
     pub name: String,

@@ -16,21 +16,37 @@ use crate::predictor::Predictor;
 use crate::utils::to_c_str;
 use model::Model;
 
-#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone)]
 pub struct Config {
-    model: Model,
-    cpu: Cpu,
-    gpu: Option<Gpu>,
-    xpu: Option<Xpu>,
-    onnx_runtime: Option<ONNXRuntime>,
-    ir_optimization: bool,
-    ir_debug: bool,
-    lite: Option<LiteEngine>,
-    memory_optimization: bool,
-    optimization_cache_dir: Option<String>,
-    disable_fc_padding: bool,
-    profile: bool,
-    disable_log: bool,
+    /// 模型设置
+    pub model: Model,
+    /// CPU 配置
+    pub cpu: Cpu,
+    /// GPU 配置
+    pub gpu: Option<Gpu>,
+    /// XPU 配置
+    pub xpu: Option<Xpu>,
+    /// ONNXRuntime 设置
+    pub onnx_runtime: Option<ONNXRuntime>,
+    /// 启用 IR 优化, 默认打开
+    pub ir_optimization: bool,
+    /// 是否在图分析阶段打印 IR，启用后会在每一个 PASS 后生成 dot 文件, 默认关闭
+    pub ir_debug: bool,
+    /// 启用 Lite 子图
+    pub lite: Option<LiteEngine>,
+    /// 开启内存/显存复用，具体降低内存效果取决于模型结构
+    pub memory_optimization: bool,
+    /// 缓存路径
+    ///
+    /// **注意：** 如果当前使用的为 TensorRT INT8 且设置从内存中加载模型，则必须通过该方法来设置缓存路径。
+    pub optimization_cache_dir: Option<String>,
+    /// 禁用 FC Padding
+    pub disable_fc_padding: bool,
+    /// 打开 Profile，运行结束后会打印所有 OP 的耗时占比。
+    pub profile: bool,
+    /// 去除 Paddle Inference 运行中的 LOG
+    pub disable_log: bool,
 }
 
 impl Config {
@@ -73,8 +89,8 @@ impl Config {
     /// 设置缓存路径
     ///
     /// **注意：** 如果当前使用的为 TensorRT INT8 且设置从内存中加载模型，则必须通过该方法来设置缓存路径。
-    pub fn set_optimization_cache_dir(mut self, dir: String) -> Self {
-        self.optimization_cache_dir = Some(dir);
+    pub fn set_optimization_cache_dir<S: ToString>(mut self, dir: S) -> Self {
+        self.optimization_cache_dir = Some(dir.to_string());
         self
     }
 

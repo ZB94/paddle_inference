@@ -4,7 +4,8 @@ use crate::ctypes::{PD_Config, PD_ConfigSetModel, PD_ConfigSetModelBuffer, PD_Co
 use crate::utils::to_c_str;
 
 /// 预测模型
-#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(untagged))]
+#[derive(Debug, Clone)]
 pub enum Model {
     /// 设置模型文件路径，当需要从磁盘加载**非Combined**模型时使用
     ///

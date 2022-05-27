@@ -5,7 +5,8 @@ use crate::ctypes::{PD_Config, PD_ConfigEnableLiteEngine};
 use crate::utils::to_c_str;
 
 /// Lite 子图
-#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone)]
 pub struct LiteEngine {
     /// Lite 子图的运行精度
     pub precision: PrecisionType,
