@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2022-05-27
+
 ### Added
 
 - 添加`serde` feature。启用时`config`中的所有结构及`common::{DataType, PlaceType, PrecisionType}`可以被序列化和反序列化
@@ -18,13 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 公开`config::Config`的所有属性
 - `config::Config::set_optimization_cache_dir`参数类型修改为实现`ToString`特质的结构
 
-## 0.3.0
+## [0.3.0]
 
 ### Fixed
 
 - 修复`config::setting::Xpu`的文档说明错误，将`l3_workspace_size_mb`重命名为`l3_workspace_size`
 
-## ~~0.2.0~~
+## ~~[0.2.0]~~
 
 ### Changed
 - 添加`libloading`依赖，动态库加载方式修改为使用`libloading`动态加载
