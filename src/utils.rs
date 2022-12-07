@@ -13,8 +13,8 @@ pub fn to_c_str(s: &str) -> (Option<CString>, *const i8) {
         .unwrap_or_else(|_| (None, s.as_ptr() as *const _))
 }
 
-/// 将 shape 为`[width, height, channel]`的数据转为`[channel, height, width]`
-pub fn whc_to_chw<T: Copy>(src: &[T], dst: &mut [T], width: usize, height: usize, channel: usize) {
+/// 将 shape 为`[height, width, channel]`的数据转为`[channel, height, width]`
+pub fn hwc_to_chw<T: Copy>(src: &[T], dst: &mut [T], width: usize, height: usize, channel: usize) {
     let size = width * height;
     for k in 0..channel {
         for y in 0..height {
@@ -29,7 +29,7 @@ pub fn whc_to_chw<T: Copy>(src: &[T], dst: &mut [T], width: usize, height: usize
 }
 
 #[test]
-fn test_whc_to_chw() {
+fn test_hwc_to_chw() {
     let mut src = [0; 4 * 4 * 3];
     for (idx, v) in src.iter_mut().enumerate() {
         *v = idx as u8;
@@ -43,7 +43,7 @@ fn test_whc_to_chw() {
 
     let mut out = [0; 48];
 
-    whc_to_chw(&src, &mut out, 4, 4, 3);
+    hwc_to_chw(&src, &mut out, 4, 4, 3);
 
     assert_eq!(out, dst);
 }
