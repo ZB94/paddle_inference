@@ -1,4 +1,3 @@
-use once_cell::sync::Lazy;
 use opencv::{
     core::{
         copy_make_border, Point2i, Rect, Size, Vector, BORDER_CONSTANT, BORDER_ISOLATED, CV_32FC1,
@@ -11,15 +10,13 @@ use opencv::{
 };
 use paddle_inference::{ctypes::PlaceType, utils::hwc_to_chw, Predictor};
 
-const LABEL_ALL: &'static str = include_str!("../resource/ppocr_keys_v1.txt");
-pub const LABEL_LIST: Lazy<Vec<&'static str>> = Lazy::new(|| LABEL_ALL.lines().collect());
-
 /// 识别文本行
 pub fn recognize(
     model: &Predictor,
     image: &Mat,
     roi_list: &[Rect],
     batch_size: usize,
+    lbaels: &[String],
 ) -> Result<Vec<String>, opencv::Error> {
     if roi_list.is_empty() {
         return Ok(vec![]);
@@ -28,7 +25,7 @@ pub fn recognize(
     if roi_list.len() > batch_size {
         let mut all = vec![];
         for l in roi_list.chunks(batch_size) {
-            all.append(&mut recognize(model, image, l, batch_size)?);
+            all.append(&mut recognize(model, image, l, batch_size, lbaels)?);
         }
 
         return Ok(all);
@@ -91,7 +88,7 @@ pub fn recognize(
         let mut data = vec![0.0f32; size.iter().fold(1usize, |s, v| s * *v as usize)];
         out.copy_to_f32(&mut data);
 
-        let range = 1..LABEL_LIST.len();
+        let range = 1..lbaels.len();
         let r = data
             .chunks(line_chunks_size)
             .map(|line| {
@@ -100,7 +97,7 @@ pub fn recognize(
                         c.iter()
                             .enumerate()
                             .max_by_key(|(_, v)| (*v * 10000.0) as usize)
-                            .and_then(|(k, _)| range.contains(&k).then(|| LABEL_LIST[k - 1]))
+                            .and_then(|(k, _)| range.contains(&k).then(|| lbaels[k - 1].as_str()))
                     })
                     .collect::<Vec<_>>()
                     .join("")
