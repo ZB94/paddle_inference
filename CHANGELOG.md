@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- 将`whc_to_chw`修正为`hwc_to_chw`
+
+### Added
+
+- 添加ocr示例
+
 ## [0.4.0] - 2022-05-27
 
 ### Added

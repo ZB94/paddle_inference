@@ -2,6 +2,11 @@
 
 本库是对百度飞浆推理库C接口的封装，详细说明请参考[官方文档](https://paddleinference.paddlepaddle.org.cn/api_reference/c_api_index.html)
 
+## 已测试`paddle_inference_c`版本
+
+- v2.3
+- v2.4.2
+
 ## 使用说明
 
 1. 编译前请先[下载或编译预测库](https://paddleinference.paddlepaddle.org.cn/user_guides/source_compile.html)
